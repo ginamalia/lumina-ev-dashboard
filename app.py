@@ -392,8 +392,8 @@ with tab3:
         "MODEL Y": "https://digitalassets.tesla.com/tesla-contents/image/upload/f_auto,q_auto/Homepage-Card-Model-Y-Desktop-US-v2.jpg", 
         "MODEL 3": "https://digitalassets.tesla.com/tesla-contents/image/upload/f_auto,q_auto/Homepage-Card-Model-3-Desktop-US-v2.jpg",
         "LEAF": "https://dealernissandijakarta.com/wp-content/uploads/2021/08/nissan-leaf-1.jpg",
-        "BOLT EV": "https://cdn.motor1.com/images/mgl/ow6gL/s1/2022-chevrolet-bolt-euv-interior.webp",
-        "MODEL X": "https://digitalassets.tesla.com/tesla-contents/image/upload/f_auto,q_auto/Homepage-Card-Model-X-New-Desktop-US-v4.jpg",
+        "MODEL S": "https://digitalassets.tesla.com/tesla-contents/image/upload/f_auto,q_auto/Homepage-Card-Model-S-Desktop-US-v3.jpg",
+        "BOLT EV": "https://media.architecturaldigest.com/photos/58910b7233bd1de9129eab2c/master/pass/Chevrolet%20Bolt%20EV%201.jpg",
     }
 
     # --- Baris 1: Top 15 Merek (Treemap - Full Width) ---

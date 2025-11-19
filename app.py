@@ -439,7 +439,7 @@ with tab3:
     # --- Insight & Foto Template ---
     st.markdown("---")
     if not top_makes.empty and not top_models.empty:
-        display_insight(f"**{top_makes.index[0]}** mendominasi pasar, sementara model paling populer adalah **{top_models.index[0]}**.")
+        display_insight(f"{top_makes.index[0]} mendominasi pasar, sementara model paling populer adalah {top_models.index[0]}.")
     else:
         display_insight("Tidak ada data Merek atau Model yang tersedia berdasarkan filter saat ini.")
     

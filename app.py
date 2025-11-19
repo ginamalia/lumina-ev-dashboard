@@ -396,26 +396,25 @@ with tab3:
         "MODEL X": "https://digitalassets.tesla.com/tesla-contents/image/upload/f_auto,q_auto/Homepage-Card-Model-X-New-Desktop-US-v4.jpg",
     }
 
-    # --- Baris 1: Top 15 Merek (Bar Chart - Full Width) ---
+    # --- Baris 1: Top 15 Merek (Treemap - Full Width) ---
     st.markdown("### Distribusi Merek Kendaraan")
     top_makes = df_filtered['Make'].value_counts().nlargest(15)
-    fig_make = go.Figure(go.Bar(
-        x=top_makes.index,
-        y=top_makes.values,
-        marker=dict(
-            color=top_makes.values,
-            colorscale='Blues',
-            showscale=False
-        ),
-        text=top_makes.values,
-        textposition='auto'
+    
+    fig_make = go.Figure(go.Treemap(
+        labels=top_makes.index,
+        parents=[""] * len(top_makes), # Set parents to empty string list for top level
+        values=top_makes.values,
+        marker=dict(colorscale='Blues'),
+        textposition='middle center',
+        texttemplate='<b>%{label}</b><br>%{value:,.0f}',
+        hovertemplate='<b>%{label}</b><br>Jumlah: %{value:,.0f}<br>Pangsa: %{percentParent:.1%}<extra></extra>'
     ))
+    
     fig_make.update_layout(
-        title="Top 15 Merek Kendaraan",
-        xaxis_title="Merek",
-        yaxis_title="Jumlah",
+        title="Top 15 Merek Kendaraan (Pangsa Pasar)",
         height=500
     )
+    # Terapkan tema gelap dan tampilkan
     st.plotly_chart(apply_dark_theme(fig_make), use_container_width=True)
 
     st.markdown("---")
@@ -438,12 +437,12 @@ with tab3:
     st.plotly_chart(apply_dark_theme(fig_model), use_container_width=True)
     
     # --- Insight & Foto Template ---
+    st.markdown("---")
     if not top_makes.empty and not top_models.empty:
-        display_insight(f"{top_makes.index[0]} mendominasi pasar, sementara model paling populer adalah {top_models.index[0]}.")
+        display_insight(f"**{top_makes.index[0]}** mendominasi pasar, sementara model paling populer adalah **{top_models.index[0]}**.")
     else:
         display_insight("Tidak ada data Merek atau Model yang tersedia berdasarkan filter saat ini.")
     
-    st.markdown("---")
     st.markdown("### 📷 Top 5 Model Kendaraan Terpopuler")
     
     # Mengatur layout foto dalam satu baris horizontal kecil
@@ -451,7 +450,7 @@ with tab3:
     cols_photo = st.columns(5)
     
     for i, model_name in enumerate(top_5_model_names):
-        # Ambil URL dari mapping, jika tidak ada, gunakan URL kosong
+        # Ambil URL dari mapping
         image_url = MODEL_IMAGE_MAP.get(model_name, "")
         
         with cols_photo[i]:

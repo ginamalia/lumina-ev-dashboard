@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
+from datetime import datetime
 
 # -----------------------------------------------------------------------------
 # 1. KONFIGURASI HALAMAN & CSS
@@ -54,7 +55,7 @@ st.markdown("""
         padding-left: 10px;
     }
 
-    /* Insight Box Styling (Menyesuaikan Referensi Image) */
+    /* Insight Box Styling */
     .insight-box {
         background-color: #0F2838; /* Dark Blue Background */
         border: 1px solid #1E3D53;
@@ -95,22 +96,17 @@ st.markdown("""
         border-bottom: 2px solid #00D4FF;
     }
     
-    /* PERBAIKAN: Mengubah warna chip multiselect dari merah ke biru */
-    /* Menargetkan chip yang dipilih (selected) */
+    /* Chip Multiselect Styling */
     .stMultiSelect [data-testid="stStatusWidget"] {
-        background-color: #007BFF; /* Warna background chip (Biru) */
+        background-color: #007BFF;
         border: 1px solid #00D4FF; 
-        color: white; /* Warna teks chip */
+        color: white;
     }
-    
-    /* Menargetkan tombol 'X' di dalam chip */
     .stMultiSelect [data-testid="stStatusWidget"] svg {
-        fill: white; /* Warna ikon 'X' */
+        fill: white;
     }
-    
-    /* Menargetkan tombol 'X' pada saat hover (agar tidak kembali ke merah) */
     .stMultiSelect [data-testid="stStatusWidget"]:hover svg {
-        fill: #FFDD00; /* Warna kuning agar terlihat interaktif saat hover */
+        fill: #FFDD00;
     }
 
     /* Styling untuk container foto mobil di Tab Merek */
@@ -121,7 +117,7 @@ st.markdown("""
         padding: 10px;
         text-align: center;
         margin-bottom: 10px;
-        height: 100%; /* Agar tinggi container konsisten */
+        height: 100%; 
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -221,8 +217,11 @@ with st.sidebar:
     )
     
     st.markdown("---")
+    
+    st.info("🌙 **Saran Tampilan:** Dashboard ini dioptimalkan untuk **Dark Mode**. Silakan atur tema melalui menu Settings (⋮) > Settings > Theme > Dark.")
+    
     st.markdown("### 📊 Tentang Dashboard")
-    st.info("""
+    st.markdown("""
     Dashboard ini menganalisis data kendaraan listrik di Washington State, USA.
     Sumber Data: Dataset Kaggle - Global Electric Vehicle Trends
     
@@ -249,7 +248,7 @@ if df_filtered.empty:
     df_filtered = df_clean
 
 # Judul Utama
-st.markdown('<div class="main-header">⚡ Dashboard Analisis Kendaraan Listrik</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">⚡ Dashboard Analisis Kendaraan Listrik Tahun 2000-2025</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-text">Analisis Tren Adopsi EV di Negara Bagian Washington, USA</div>', unsafe_allow_html=True)
 
 # Metrics
@@ -263,7 +262,7 @@ phev_count_filtered = len(df_filtered[df_filtered['Electric Vehicle Type'] == 'P
 m1.metric("Total Kendaraan", f"{total_ev_filtered:,}", delta=f"{(total_ev_filtered/total_ev_clean*100):.1f}% dari total" if total_ev_clean > 0 else "N/A")
 m2.metric("Total BEV", f"{bev_count_filtered:,}", delta=f"{(bev_count_filtered/total_ev_filtered*100):.1f}%" if total_ev_filtered > 0 else "0.0%")
 m3.metric("Total PHEV", f"{phev_count_filtered:,}", delta=f"{(phev_count_filtered/total_ev_filtered*100):.1f}%" if total_ev_filtered > 0 else "0.0%")
-m4.metric("Merek Unik", f"{df_filtered['Make'].nunique()}", delta=f"{df_filtered['Model'].nunique()} model")
+m4.metric("Merek", f"{df_filtered['Make'].nunique()}", delta=f"{df_filtered['Model'].nunique()} model")
 
 st.markdown("---")
 
@@ -360,7 +359,7 @@ with tab2:
         fig_trend.add_annotation(
             x=peak_row['Model Year'],
             y=peak_row['Count'],
-            text=f"Peak: {peak_row['Count']:,}",
+            text=f"Puncak: {peak_row['Count']:,}",
             showarrow=True,
             arrowhead=2,
             arrowcolor="white",
@@ -377,7 +376,14 @@ with tab2:
     st.plotly_chart(apply_dark_theme(fig_trend), use_container_width=True)
     
     if not trend_data.empty:
-        display_insight(f"Adopsi EV mengalami lonjakan signifikan mulai tahun 2018, mencapai puncaknya pada tahun {int(peak_row['Model Year'])}.")
+        base_insight = f"Adopsi EV mengalami lonjakan signifikan mulai tahun 2018, mencapai puncaknya pada tahun {int(peak_row['Model Year'])}."
+        
+        # Cek apakah ada data di atas tahun saat ini (misal 2025)
+        current_year = datetime.now().year
+        if trend_data['Model Year'].max() > current_year:
+            base_insight += f"<br><br><strong>Mengapa ada data tahun {trend_data['Model Year'].max()}?</strong><br>Dalam industri otomotif, <em>Model Year</em> (Tahun Model) seringkali dirilis lebih awal dari tahun kalender sebenarnya. Mobil dengan 'Model Year 2026' biasanya sudah mulai diproduksi dan dijual pada pertengahan atau akhir tahun 2025."
+            
+        display_insight(base_insight)
     else:
         display_insight("Tidak ada data tren yang tersedia berdasarkan filter saat ini.")
 
@@ -437,16 +443,17 @@ with tab3:
     st.plotly_chart(apply_dark_theme(fig_model), use_container_width=True)
     
     # --- Insight & Foto Template ---
-    st.markdown("---")
     if not top_makes.empty and not top_models.empty:
         display_insight(f"{top_makes.index[0]} mendominasi pasar, sementara model paling populer adalah {top_models.index[0]}.")
     else:
         display_insight("Tidak ada data Merek atau Model yang tersedia berdasarkan filter saat ini.")
     
-    st.markdown("### 📷 Top 5 Model Kendaraan Terpopuler")
+    st.markdown("---")
+
+    st.markdown("### 📷 Top 5 Model Kendaraan Terpopuler Sepanjang Masa")
     
     # Mengatur layout foto dalam satu baris horizontal kecil
-    top_5_model_names = df_filtered['Model'].value_counts().nlargest(5).index.tolist()[:5]
+    top_5_model_names= df_clean['Model'].value_counts().nlargest(5).index.tolist()[:5]
     cols_photo = st.columns(5)
     
     for i, model_name in enumerate(top_5_model_names):
@@ -454,12 +461,20 @@ with tab3:
         image_url = MODEL_IMAGE_MAP.get(model_name, "")
         
         with cols_photo[i]:
-            st.markdown(f"""
-            <div class="car-photo-container">
-                <img src="{image_url}" class="model-image" alt="Foto {model_name}" />
-                <div class="model-name">#{i+1}: {model_name}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            if image_url:
+                st.markdown(f"""
+                <div class="car-photo-container">
+                    <img src="{image_url}" class="model-image" alt="Foto {model_name}" />
+                    <div class="model-name">#{i+1}: {model_name}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="car-photo-container">
+                    <div style="height: 100px; display:flex; align-items:center; justify-content:center;">No Image</div>
+                    <div class="model-name">#{i+1}: {model_name}</div>
+                </div>
+                """, unsafe_allow_html=True)
             
 # --- TAB 4: TIPE EV ---
 with tab4:
@@ -483,21 +498,30 @@ with tab4:
         st.plotly_chart(apply_dark_theme(fig_type_bar), use_container_width=True)
         
     with col_type2:
-        top_5_counties = df_filtered['County'].value_counts().nlargest(5).index
-        df_top5 = df_filtered[df_filtered['County'].isin(top_5_counties)]
         
+        # 1. Ambil 5 county teratas dan simpan urutannya (index-nya)
+        top_5_counts_series = df_filtered['County'].value_counts().nlargest(5)
+        top_5_counties_ordered = top_5_counts_series.index.tolist() # List urutan: ['King', 'Snohomish', ...]
+        
+        # 2. Filter data hanya untuk 5 county ini
+        df_top5 = df_filtered[df_filtered['County'].isin(top_5_counties_ordered)]
+        
+        # 3. Buat pivot/crosstab
         type_county = df_top5.groupby(['County', 'Electric Vehicle Type']).size().unstack().fillna(0)
+        
+        # 4. PENTING: Reindex DataFrame pivot agar barisnya mengikuti urutan 'top_5_counties_ordered'
+        type_county = type_county.reindex(top_5_counties_ordered)
         
         fig_stack = go.Figure()
         fig_stack.add_trace(go.Bar(
             name='BEV',
-            x=type_county.index,
+            x=type_county.index, # Index sekarang sudah terurut
             y=type_county.get('Battery Electric Vehicle (BEV)', 0),
             marker_color=PRIMARY_COLOR
         ))
         fig_stack.add_trace(go.Bar(
             name='PHEV',
-            x=type_county.index,
+            x=type_county.index, # Index sekarang sudah terurut
             y=type_county.get('Plug-in Hybrid Electric Vehicle (PHEV)', 0),
             marker_color=SECONDARY_COLOR
         ))
